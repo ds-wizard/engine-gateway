@@ -1,0 +1,83 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  btp:
+    name: Build-Tag-Push
+    runs-on: ubuntu-latest
+
+    env:
+      PUBLIC_IMAGE_PREFIX: 'datastewardshipwizard'
+      DOCKER_IMAGE_NAME: 'engine-gateway'
+      DOCKER_META_CONTEXT: '.'
+      DOCKER_META_FILE: 'Dockerfile'
+      DOCKER_META_PLATFORMS: 'linux/amd64,linux/arm64'
+
+    steps:
+    - name: '[setup] Check out repository'
+      uses: actions/checkout@v5
+
+    - name: '[setup] Set up QEMU'
+      uses: docker/setup-qemu-action@v3
+
+    - name: '[setup] Set up Docker Buildx'
+      id: buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: '[setup] Update build info'
+      run: |
+        ./scripts/build-info.sh
+
+    - name: '[docker] Docker meta'
+      id: meta-test
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ${{ env.PUBLIC_IMAGE_PREFIX }}/${{ env.DOCKER_IMAGE_NAME }}
+        tags: |
+          type=sha
+
+    - name: '[docker] Docker build'
+      uses: docker/build-push-action@v6
+      with:
+        context: ${{ env.DOCKER_META_CONTEXT }}
+        file: ${{ env.DOCKER_META_FILE }}
+        platforms: ${{ env.DOCKER_META_PLATFORMS }}
+        push: false
+        tags: ${{ steps.meta-test.outputs.tags }}
+        labels: ${{ steps.meta-test.outputs.labels }}
+
+    - name: '[docker-hub] Docker login'
+      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+    - name: '[docker-hub] Docker meta'
+      id: meta-public
+      if: github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'
+      uses: docker/metadata-action@v5
+      with:
+        images: |
+          ${{ env.PUBLIC_IMAGE_PREFIX }}/${{ env.DOCKER_IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}},enable=${{ !startsWith(github.ref, 'refs/tags/v0.') }}
+
+    - name: '[docker-hub] Docker build+push'
+      uses: docker/build-push-action@v6
+      if: github.event_name != 'pull_request' && steps.meta-public.outputs.tags != ''
+      with:
+        context: ${{ env.DOCKER_META_CONTEXT }}
+        file: ${{ env.DOCKER_META_FILE }}
+        platforms: ${{ env.DOCKER_META_PLATFORMS }}
+        push: true
+        tags: ${{ steps.meta-public.outputs.tags }}
+        labels: ${{ steps.meta-public.outputs.labels }}

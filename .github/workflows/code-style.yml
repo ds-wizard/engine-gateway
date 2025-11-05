@@ -1,0 +1,124 @@
+name: Code Style
+
+on:
+  push:
+
+jobs:
+  # Flake 8 for basic code style checks
+  flake8:
+    name: Flake 8
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.13
+        cache: pip
+        cache-dependency-path: |
+          **/pyproject.toml
+          **/requirements*.txt
+
+    - name: Install Flake8 (7.3.0)
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8==7.3.0
+
+    - name: Update build info
+      run: |
+        ./scripts/build-info.sh
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Install package
+      run: |
+        pip install .
+
+    - name: Lint with flake8
+      run: |
+        flake8 src/engine_gateway --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 src/engine_gateway --count --max-complexity=16 --max-line-length=200 --statistics
+
+  # Typing checks with MyPy
+  typing:
+    name: Typing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.13
+        cache: pip
+        cache-dependency-path: |
+          **/pyproject.toml
+          **/requirements*.txt
+
+    - name: Install MyPy (1.16.1)
+      run: |
+        python -m pip install --upgrade pip
+        pip install mypy==1.16.1
+
+    - name: Update build info
+      run: |
+        ./scripts/build-info.sh
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Install packages
+      run: |
+        pip install .
+
+    - name: Check typing with MyPy
+      run: |
+        mypy --install-types --ignore-missing-imports \
+             --check-untyped-defs --non-interactive \
+             src/engine_gateway
+
+  # Pylint
+  pylint:
+    name: Pylint
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.13
+        cache: pip
+        cache-dependency-path: |
+          **/pyproject.toml
+          **/requirements*.txt
+
+    - name: Install PyLint (3.3.7)
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint==3.3.7
+
+    - name: Update build info
+      run: |
+        ./scripts/build-info.sh
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Install packages
+      run: |
+        pip install .
+
+    - name: Lint with PyLint
+      run: |
+        pylint --rcfile=.pylintrc.ini src/engine_gateway

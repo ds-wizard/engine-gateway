@@ -1,0 +1,28 @@
+gateway:
+  title: Engine Gateway
+  root_path: /gateway
+  info:
+    enabled: true
+    token: secretToken
+
+mounts:
+  /example1:
+    module: example_app
+    app: app
+  /example2:
+    module: another_app.app
+    factory: create_app
+    kwargs:
+      debug: true
+      database_url: sqlite:///example.db
+
+# Optional Sentry configuration
+sentry:
+  dsn: https://sentry.io/your-dsn
+  traces_sample_rate: 0.2
+  profiles_sample_rate: 0.1
+  max_breadcrumbs: 50
+  environment: production
+  tags:
+    foo: bar
+  aws_lambda: true

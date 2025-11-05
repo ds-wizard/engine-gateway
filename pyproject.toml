@@ -1,0 +1,40 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'dsw-engine-gateway'
+version = '0.1.0'
+description = 'Framework for services around DSW'
+readme = 'README.md'
+keywords = ['wizard', 'gateway', 'app', 'api', 'services']
+license = { text = 'Apache-2.0' }
+authors = [
+    { name = 'Marek Suchánek', email = 'marek.suchanek@ds-wizard.org' }
+]
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: Apache Software License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3.13',
+]
+requires-python = '>=3.13, <4'
+dependencies = [
+    'fastapi >=0.120, <1.0',
+    'PyYAML >=6.0, <7.0',
+    'sentry-sdk >=2.44.0, <3.0.0',
+]
+
+[project.urls]
+Homepage = 'https://ds-wizard.org'
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ['src']
+
+[tool.distutils.bdist_wheel]
+universal = true

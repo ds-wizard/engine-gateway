@@ -1,0 +1,6 @@
+.github/
+scripts/
+config.yaml
+config.example.yaml
+.pylintrc.ini
+LICENSE
