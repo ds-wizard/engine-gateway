@@ -1,5 +1,6 @@
 gateway:
   title: Engine Gateway
+  version: X.Y.Z
   root_path: /gateway
   info:
     enabled: true

@@ -50,8 +50,12 @@ class EngineGateway(fastapi.FastAPI):
 def create_info(config: Config) -> schemas.GatewayInfo:
     packages = list(freeze.freeze())
     return schemas.GatewayInfo(
-        version=BUILD_INFO.version,
-        built_at=BUILD_INFO.built_at,
+        title=config.gateway.title,
+        version=config.gateway.version,
+        engine_gateway=schemas.EngineInfo(
+            version=BUILD_INFO.version,
+            built_at=BUILD_INFO.built_at,
+        ),
         mounts=config.mounts,
         packages=packages,
     )
