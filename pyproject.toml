@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'dsw-engine-gateway'
-version = '0.1.0'
+version = '1.0.0'
 description = 'Framework for services around DSW'
 readme = 'README.md'
 keywords = ['wizard', 'gateway', 'app', 'api', 'services']
@@ -13,7 +13,7 @@ authors = [
     { name = 'Marek Suchánek', email = 'marek.suchanek@ds-wizard.org' }
 ]
 classifiers = [
-    'Development Status :: 4 - Beta',
+    'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: Apache Software License',
     'Operating System :: OS Independent',

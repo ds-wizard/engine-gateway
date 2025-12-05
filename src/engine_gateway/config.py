@@ -40,6 +40,7 @@ class SentryConfig(pydantic.BaseModel):
 
 class GatewayConfig(pydantic.BaseModel):
     title: str
+    version: str
     root_path: str
     info_enabled: bool
     info_token: str | None
@@ -50,6 +51,7 @@ class Config:
     def __init__(self):
         self.gateway: GatewayConfig = GatewayConfig(
             title='Engine Gateway',
+            version='unknown',
             root_path='',
             info_enabled=False,
             info_token=None,
@@ -118,6 +120,8 @@ class Config:
     def load_env(self):
         if 'GATEWAY_TITLE' in os.environ:
             self.gateway.title = os.getenv('GATEWAY_TITLE', 'Engine Gateway')
+        if 'GATEWAY_VERSION' in os.environ:
+            self.gateway.version = os.getenv('GATEWAY_VERSION', 'unknown')
         if 'GATEWAY_ROOT_PATH' in os.environ:
             self.gateway.root_path = os.getenv('GATEWAY_ROOT_PATH', '')
         if 'GATEWAY_INFO_ENABLED' in os.environ:
