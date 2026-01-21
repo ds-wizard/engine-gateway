@@ -92,6 +92,8 @@ class Config:
         gateway_data = data.get('gateway', {})
         if 'title' in gateway_data:
             self.gateway.title = gateway_data['title']
+        if 'version' in gateway_data:
+            self.gateway.version = gateway_data['version']
         if 'root_path' in gateway_data:
             self.gateway.root_path = gateway_data['root_path']
         info_data = gateway_data.get('info', None)
