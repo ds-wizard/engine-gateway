@@ -23,7 +23,13 @@ sentry:
   traces_sample_rate: 0.2
   profiles_sample_rate: 0.1
   max_breadcrumbs: 50
+  # default: development
   environment: production
+  # default: version of engine-gateway, e.g. set vX.Y.Z~<sha> of the deployment
+  release: v1.2.3~abc1234
+  # `component` tag, default: gateway
+  component: gateway
+  # additional tags for all events
   tags:
     foo: bar
   aws_lambda: true

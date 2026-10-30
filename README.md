@@ -60,8 +60,28 @@ You can also use the following environment variables to override configuration o
 - `SENTRY_TRACES_SAMPLE_RATE`: Sample rate for Sentry performance tracing (default: `1.0`).
 - `SENTRY_PROFILES_SAMPLE_RATE`: Sample rate for Sentry profiling (default: `1.0`).
 - `SENTRY_MAX_BREADCRUMBS`: Maximum number of breadcrumbs to store in Sentry (default: `100`).
-- `SENTRY_ENVIRONMENT`: Environment name for Sentry (default: `production`).
+- `SENTRY_ENVIRONMENT`: Environment name for Sentry (default: `development`).
+- `SENTRY_RELEASE`: Release reported to Sentry, e.g. `vX.Y.Z~<sha>` of the deployment (default: version of Engine Gateway).
+- `SENTRY_COMPONENT`: Value of the `component` tag (default: `gateway`).
 - `SENTRY_AWS_LAMBDA`: Enable AWS Lambda integration for Sentry (default: `false`).
+
+### Sentry
+
+When Sentry is enabled, events are reported in the same shape as by the FAIR Wizard backend. Every event has the `component` tag (plus any `sentry.tags`), and events from requests also have:
+
+- `method` and `route` tags, where `route` is the template of the matched route including the root path and mount path, with UUID segments masked as `:uuid` (e.g. `/gateway/plugins/:uuid/projects/{project_uuid}`),
+- `traceUuid` tag from the `X-Trace-Uuid` request header, which is also used as the Sentry trace ID (unless the request has a `sentry-trace` header),
+- `tenantUuid` tag and user ID from the `tenantUuid` and `userUuid` (or `sub`) claims of the bearer JWT; the token is decoded without verification and used only for these values,
+- fingerprint `[method, route, exception type]`, so errors are grouped per route.
+
+Request data is kept in a separate scope for each request, so it does not leak between requests (or Lambda invocations).
+
+### Development
+
+```bash
+pip install -r requirements.txt -r requirements.dev.txt -e .
+pytest
+```
 
 ### Usage
 
