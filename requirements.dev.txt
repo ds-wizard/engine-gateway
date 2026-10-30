@@ -1,2 +1,4 @@
 uvicorn==0.38.0
 setuptools==80.9.0
+pytest==8.4.2
+httpx==0.28.1

@@ -1,6 +1,6 @@
 import fastapi
 
-from .build_info import BuildInfo
+from .build_info import BUILD_INFO
 from .config import Config
 from .logic import EngineGateway, create_info
 from .sentry import init_sentry
@@ -16,7 +16,7 @@ def create_app(config: Config | None = None) -> EngineGateway:
 
     app = EngineGateway(
         title=config.gateway.title,
-        version=BuildInfo.version,
+        version=BUILD_INFO.version,
         root_path=config.gateway.root_path.rstrip('/'),
     )
 

@@ -33,7 +33,9 @@ class SentryConfig(pydantic.BaseModel):
     traces_sample_rate: float | None
     profiles_sample_rate: float | None
     max_breadcrumbs: int | None
-    environment: str | None
+    environment: str
+    release: str | None
+    component: str
     tags: dict[str, str]
     aws_lambda: bool = False
 
@@ -61,7 +63,9 @@ class Config:
             traces_sample_rate=None,
             profiles_sample_rate=None,
             max_breadcrumbs=None,
-            environment=None,
+            environment='development',
+            release=None,
+            component='gateway',
             aws_lambda=False,
             tags={},
         )
@@ -114,12 +118,20 @@ class Config:
                 self.sentry.max_breadcrumbs = int(sentry_data['max_breadcrumbs'])
             if 'environment' in sentry_data:
                 self.sentry.environment = sentry_data['environment']
+            if 'release' in sentry_data:
+                self.sentry.release = sentry_data['release']
+            if 'component' in sentry_data:
+                self.sentry.component = sentry_data['component']
             if 'tags' in sentry_data:
                 self.sentry.tags = sentry_data['tags']
             if 'aws_lambda' in sentry_data:
                 self.sentry.aws_lambda = bool(sentry_data['aws_lambda'])
 
     def load_env(self):
+        self._load_env_gateway()
+        self._load_env_sentry()
+
+    def _load_env_gateway(self):
         if 'GATEWAY_TITLE' in os.environ:
             self.gateway.title = os.getenv('GATEWAY_TITLE', 'Engine Gateway')
         if 'GATEWAY_VERSION' in os.environ:
@@ -131,6 +143,7 @@ class Config:
         if 'GATEWAY_INFO_TOKEN' in os.environ:
             self.gateway.info_token = os.getenv('GATEWAY_INFO_TOKEN')
 
+    def _load_env_sentry(self):
         if 'SENTRY_DSN' in os.environ:
             self.sentry.dsn = os.getenv('SENTRY_DSN')
         if 'SENTRY_TRACES_SAMPLE_RATE' in os.environ:
@@ -140,6 +153,10 @@ class Config:
         if 'SENTRY_MAX_BREADCRUMBS' in os.environ:
             self.sentry.max_breadcrumbs = int(os.getenv('SENTRY_MAX_BREADCRUMBS', '100'))
         if 'SENTRY_ENVIRONMENT' in os.environ:
-            self.sentry.environment = os.getenv('SENTRY_ENVIRONMENT')
+            self.sentry.environment = os.getenv('SENTRY_ENVIRONMENT', 'development')
+        if 'SENTRY_RELEASE' in os.environ:
+            self.sentry.release = os.getenv('SENTRY_RELEASE')
+        if 'SENTRY_COMPONENT' in os.environ:
+            self.sentry.component = os.getenv('SENTRY_COMPONENT', 'gateway')
         if 'SENTRY_AWS_LAMBDA' in os.environ:
             self.sentry.aws_lambda = _is_true(os.getenv('SENTRY_AWS_LAMBDA', 'false'))
