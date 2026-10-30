@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'dsw-engine-gateway'
-version = '1.0.1'
+version = '1.1.0'
 description = 'Framework for services around DSW'
 readme = 'README.md'
 keywords = ['wizard', 'gateway', 'app', 'api', 'services']
